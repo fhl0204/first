@@ -13,3 +13,10 @@ def get_process_stopTime(uid, p_name, time_space):
     print 'end time: ', time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     return time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
 #print get_process_stopTime('zqinwen', 'cp', 1)
+
+
+def timestamp_2_strut(timestamp):
+    #timestamp = time.time()
+    time_local = time.localtime(timestamp)  #time_local = time.localtime()
+    return time.strftime("%Y-%m-%d %H:%M:%S",time_local)
+#print timestamp_2_strut(1462451334)
