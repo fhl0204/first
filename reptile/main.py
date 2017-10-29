@@ -4,10 +4,9 @@
 import urllib2
 import re
 import csv
-
 import codecs
 
-codes = ['519983', '002529', '/02318', '/SZ000001', '/SH510900', '/SZ168101']
+codes = ['513050', '001668', '110011', '000930', '110012', '000011', '210004', '210009', '000961']
 
 filename = 'result.csv'
 
@@ -64,57 +63,6 @@ def parse_one(code):
     writeResult(name, code, price, time)
 
 
-def parse_two(code):
-    # 股票
-    url = 'http://xueqiu.com/S' + code
-    html = getHtml(url)
-    #    print url
-    pattern = 'stockName"><strong.*?class="stockName">.*?</strong>'
-    nameAndCode = re.search(pattern, html).group(
-        0)  # stockName"><strong title="E Fund Management Co.,ltd." class="stockName">H股ETF(SH:510900)</strong>
-
-    pattern2 = 'class="stockName">.*?<'
-    content1 = re.search(pattern2, nameAndCode).group(0)  # class="stockName">H股ETF(SH:510900)<
-
-    nameAndCode = content1[18:len(content1) - 2]  # H股ETF(SH:510900
-
-    name = nameAndCode.split('(')[0]
-    code = nameAndCode.split('(')[1]
-
-    pattern3 = '<div id="currentQuote">.*</div>'  # 包含时间净值和时间
-    content3 = re.search(pattern3, html).group(0)
-
-    pattern4 = '<div class="currentInfo">.*?<div class="stockInfo'
-    content4 = re.search(pattern4, content3).group()
-
-    # <div class="currentInfo"><strong data-current="40.75" class="stockUp">HK$40.75</strong><span class="stockUp"><span>+0.250</span><span class="quote-percentage">  (+0.62%)</span></span></div><span class="update-quote
-    pattern5 = 'data-current=.*class="sto'
-    content5 = re.search(pattern5, content4).group()
-
-    pattern5 = 'data-current.*?class="'
-    content5 = re.search(pattern5, content5).group(0)  # data-current="40.75" class="stockUp
-
-    pattern5 = 'ent=.*cl'
-    content5 = re.search(pattern5, content5).group()
-
-    price = content5.split('\"')[1]
-
-    pattern6 = '<div class="stockInfo">.*?</div>'  # <div class="stockInfo"><span id="timeInfo">10-28 15:27:26 (北京时间)  </span></div>
-    content6 = re.search(pattern6, content3).group()
-
-    pattern6 = '<span.*?</span>'
-    content6 = re.search(pattern6, content6).group()  # <span id="timeInfo">10-28 15:29:00 (北京时间)  </span>
-
-    pattern6 = 'timeInfo">.*?<'
-    content6 = re.search(pattern6, content6).group()  # <span id="timeInfo">10-28 15:29:00 (北京时间)  </span>
-
-    pattern6 = '>.*?\('
-    content6 = re.search(pattern6, content6).group()  # timeInfo">10-28 15:30:10 (北京时间)  <
-    time = content6[1:len(content6) - 1]
-
-    writeResult(name, code, price, time)
-
-
 def writeResult(name, code, price, time):
     result = 'name:' + name + '  ' + 'code:' + code + '    ' + '单位净值:' + price + '  ' + 'time:' + time
     item = [name, code, price, time]
@@ -123,7 +71,7 @@ def writeResult(name, code, price, time):
     writer = csv.writer(csvfile, dialect='excel')
     writer.writerow(item)
     csvfile.close()
-    print '写入成功   结果为:  ' + result
+    print '写入成功 结果为:  ' + result
 
 
 item = ['股票名称', '代码', '单位净值', '     时间     ']
@@ -134,11 +82,6 @@ writer.writerow(item)
 csvfile.close()
 
 for code in codes:
-    if re.match('^\/.*?', code):
-        print '\n-----------------------------------股票-------------------------------------------'
-        parse_two(code)
-    else:
-        print '\n-----------------------------------基金-------------------------------------------'
         parse_one(code)
 
 print '\n'
