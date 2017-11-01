@@ -14,7 +14,7 @@ result = """﻿<!DOCTYPE html><!--[if lt IE 7]>  <html class="lt-ie9 lt-ie8 lt-i
 
 # <dd><span>近3月：</span><span class="ui-font-middle ui-color-red ui-num">2.27%</span></dd>
 
-pattern = '近3月：<.*>(\d{1,2}.\d{2}%)'
+pattern = '近3月：</span><span class="ui-font-middle ui-color-red ui-num">(\d{1,2}.\d{2}%)'
 
 resp = re.search(pattern, result)
 

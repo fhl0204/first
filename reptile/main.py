@@ -6,7 +6,7 @@ import re
 import csv
 import codecs
 
-codes = ['513050', '001668', '110011', '000930', '110012', '000011', '210004', '210009', '000961']
+codes = ['513050', '001668', '110011', '110012', '000011', '210009', '000961']
 
 filename = 'result.csv'
 
@@ -60,12 +60,15 @@ def parse_one(code):
 
     content7 = re.search(pattern7, content6).group(0)  # left">长信量化先锋混合(<span
     name = content7[6:len(content7) - 5]
-    writeResult(name, code, price, time)
+
+    pattern8 = '近3月：</span><span class="ui-font-middle ui-color-red ui-num">(\d{1,2}.\d{2}%)'
+    month_3_change = re.search(pattern8, html).group(1)
+    writeResult(name, code, price, time, month_3_change)
 
 
-def writeResult(name, code, price, time):
-    result = 'name:' + name + '  ' + 'code:' + code + '    ' + '单位净值:' + price + '  ' + 'time:' + time
-    item = [name, code, price, time]
+def writeResult(name, code, price, time, month_3_change):
+    result = 'name:' + name + '  ' + 'code:' + code + '    ' + '单位净值:' + price + '  ' + 'time:' + time + '  ' + 'month_3_change:' + month_3_change
+    item = [name, code, price, time, month_3_change]
     csvfile = open(filename, 'ab')
     csvfile.write(codecs.BOM_UTF8)
     writer = csv.writer(csvfile, dialect='excel')
@@ -74,7 +77,7 @@ def writeResult(name, code, price, time):
     print '写入成功 结果为:  ' + result
 
 
-item = ['股票名称', '代码', '单位净值', '     时间     ']
+item = ['股票名称', '代码', '单位净值', '     时间     ', 'month_3_change']
 csvfile = open(filename, 'wb')
 csvfile.write(codecs.BOM_UTF8)
 writer = csv.writer(csvfile)
