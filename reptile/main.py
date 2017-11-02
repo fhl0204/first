@@ -28,17 +28,15 @@ def getHtml(url):
 
 
 def parse_one(code):
-    # 基金
     url = 'http://fund.eastmoney.com/' + code + '.html'
-    #        print url
     html = getHtml(url)
+
     pattern = '<dl class="dataItem02">.*?</dl>'
-    # 将正则表达式编译成Pattern对象
     m = re.search(pattern, html)
     content = m.group(0)  # dateIemm02
 
     pattern2 = '<dd class="dataNums">.*?</dd>'
-    content2 = re.search(pattern2, content).group(0)  # 包含净值和比例的标签
+    content2 = re.search(pattern2, content).group(0)
 
     pattern3 = '<span\sclass="[^">]+">([^<>]+)</span>'
     content3 = re.search(pattern3, content2)
@@ -53,31 +51,44 @@ def parse_one(code):
     time = content5[8: len(content5) - 2]
 
     pattern6 = '<div class="fundDetail-tit">.*?</div>'
-    content6 = re.search(pattern6, html).group(
-        0)  # <div class="fundDetail-tit"><div style="float: left">长信量化先锋混合(<span class="ui-num">519983</span>)</div>
+    content6 = re.search(pattern6, html).group(0)
     content6 = content6.replace('<div class="fundDetail-tit">', '')
     pattern7 = 'left">.*?<span'
 
-    content7 = re.search(pattern7, content6).group(0)  # left">长信量化先锋混合(<span
+    content7 = re.search(pattern7, content6).group(0)
     name = content7[6:len(content7) - 5]
 
-    pattern8 = '近3月：</span><span class="ui-font-middle ui-color-red ui-num">(\d{1,2}.\d{2}%)'
-    month_3_change = re.search(pattern8, html).group(1)
-    writeResult(name, code, price, time, month_3_change)
+    pattern8 = '<dd><span>近1月：</span><span class="ui-font-middle (ui-color-red|ui-color-green)? ui-num">(-?\d{1,3}.\d{2}%|--)</span></dd>'
+    month1 = re.search(pattern8, html).group(2)
+
+    pattern9 = '<dd><span>近3月：</span><span class="ui-font-middle (ui-color-red|ui-color-green)? ui-num">(-?\d{1,3}.\d{2}%|--)</span></dd>'
+    month3 = re.search(pattern9, html).group(2)
+
+    pattern10 = '<dd><span>近6月：</span><span class="ui-font-middle (ui-color-red|ui-color-green)? ui-num">(-?\d{1,5}.\d{2}%|--)</span></dd>'
+    month6 = re.search(pattern10, html).group(2)
+
+    pattern11 = '<dd><span>近1年：</span><span class="ui-font-middle (ui-color-red|ui-color-green)? ui-num">(-?\d{1,3}.\d{2}%|--)</span></dd></dl>'
+    year1 = re.search(pattern11, html).group(2)
+
+    pattern12 = '<dd><span>近3年：</span><span class="ui-font-middle (ui-color-red|ui-color-green)? ui-num">(-?\d{1,3}.\d{2}%|--)</span></dd>'
+    year3 = re.search(pattern12, html).group(2)
+
+    pattern13 = '<dd><span>成立来：</span><span class="ui-font-middle (ui-color-red|ui-color-green)? ui-num">(-?\d{1,5}.\d{2}%|--)</span></dd>'
+    until_now = re.search(pattern13, html).group(2)
+
+    writeResult(name, code, price, time, month1, month3, month6, year1, year3, until_now)
 
 
-def writeResult(name, code, price, time, month_3_change):
-    result = 'name:' + name + '  ' + 'code:' + code + '    ' + '单位净值:' + price + '  ' + 'time:' + time + '  ' + 'month_3_change:' + month_3_change
-    item = [name, code, price, time, month_3_change]
+def writeResult(name, code, price, time, month1, month3, month6, year1, year3, until_now):
+    item = [name, code, price, time, month1, month3, month6, year1, year3, until_now]
     csvfile = open(filename, 'ab')
     csvfile.write(codecs.BOM_UTF8)
     writer = csv.writer(csvfile, dialect='excel')
     writer.writerow(item)
     csvfile.close()
-    print '写入成功 结果为:  ' + result
 
 
-item = ['股票名称', '代码', '单位净值', '     时间     ', 'month_3_change']
+item = ['name', 'number', 'value', '     time     ', 'month1' , 'month3', 'month6', 'year1', 'year3', 'until_now']
 csvfile = open(filename, 'wb')
 csvfile.write(codecs.BOM_UTF8)
 writer = csv.writer(csvfile)
