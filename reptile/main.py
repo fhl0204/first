@@ -24,7 +24,7 @@ def getHtml(url):
         'Connection': 'close',
         'Referer': None  # 注意如果依然不能抓取的话，这里可以设置抓取网站的host
         }
-    req_timeout = 5
+    req_timeout = 10
     req = urllib2.Request(url, None, req_header)
     resp = urllib2.urlopen(req, None, req_timeout)
     html = resp.read()
@@ -37,7 +37,10 @@ def parse_one(code):
 
     pattern = '<dl class="dataItem02">.*?</dl>'
     m = re.search(pattern, html)
-    content = m.group(0)  # dateIemm02
+    if m:
+        content = m.group(0)  # dateIemm02
+    else:
+        content = 'NULL'
 
     pattern2 = '<dd class="dataNums">.*?</dd>'
     content2 = re.search(pattern2, content)
@@ -54,7 +57,11 @@ def parse_one(code):
         price = 'NULL'
 
     pattern4 = '<dt>.*?</dt>'  # 带时间的dt->p->
-    content4 = re.search(pattern4, content).group(0)
+    content4 = re.search(pattern4, content)
+    if content4:
+        content4 = content4.group(0)
+    else:
+        content4 = 'NULL'
 
     pattern5 = '\(</span>.*?<'  # (</span>2016-10-27)<
     content5 = re.search(pattern5, content4)
@@ -67,13 +74,22 @@ def parse_one(code):
         time = 'NULL'
 
     pattern6 = '<div class="fundDetail-tit">.*?</div>'
-    content6 = re.search(pattern6, html).group(0)
-    content6 = content6.replace('<div class="fundDetail-tit">', '')
+    content6 = re.search(pattern6, html)
+    if content6:
+        content6 = content6.group(0)
+        content6 = content6.replace('<div class="fundDetail-tit">', '')
+    else:
+        content6 = 'NULL'
+
     pattern7 = 'left">.*?<span'
 
-    content7 = re.search(pattern7, content6).group(0)
+    content7 = re.search(pattern7, content6)
+    if content7:
+        content7 = content7.group(0)
+        name = content7[6:len(content7) - 5]
+    else:
+        content7 = 'NULL'
 
-    name = content7[6:len(content7) - 5]
 
     pattern8 = '<dd><span>近1月：</span><span class="ui-font-middle (ui-color-red|ui-color-green)? ui-num">(-?\d{1,3}.\d{2}%|--)</span></dd>'
     month1 = re.search(pattern8, html)
