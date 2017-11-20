@@ -38,5 +38,5 @@ def get_all_list(url):
         if result:
             all_list.append(result.group())
 
-    print all_list
+    print len(all_list), all_list
     return all_list
