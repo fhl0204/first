@@ -5,7 +5,7 @@ import urllib2
 import re
 import csv
 import codecs
-from tmp import get_all_list
+from gitfile import get_all_list
 
 codes = ['513050', '001668', '110011', '110012', '000011', '210009', '000961']
 url = 'http://fund.eastmoney.com/allfund.html'
